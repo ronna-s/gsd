@@ -50,8 +50,6 @@ But we all need to know how to do it.
 
 We will build a TCP server that gracefully shutdowns.
 
-* Continuing with original talk
+* BUG!
 
-Interestingly, Peter went on to describe graceful shutdowns in his own presentation
-
-.iframe https://www.youtube.com/embed/PTE4VJIdHPg?start=1028 315 560
+What's the exit status on ctrl+c?

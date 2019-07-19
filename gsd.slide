@@ -1,0 +1,47 @@
+go Shutdown()
+Shutting down a server gracefully
+19 Jul 2019
+Tags: Graceful shutdown, concurrency
+
+Ronna Steinberg
+Chapter Lead, Women Who Go Berlin
+ronnas@gmail.com
+https://www.meetup.com/Women-Who-Go-Berlin/
+@ronnax
+Sign Up Today!
+
+* Background
+
+* Peter Bourgon:
+
+_We_say_things_like_“never_start_a_goroutine_without_knowing_how_it_will_stop"_but_(...)_Most_goroutines_I_see_launched_by_my_colleagues_(...)_tend_to_be_structural_(...)_managing_long_running_components_with_indistinct_termination_semantics_
+
+.link https://peter.bourgon.org/go-for-industrial-programming/ Best Practices for Industrial Programming, *GopherCon*Europe*2018*
+
+* How do we "never start a goroutine without knowing how it will stop"?
+
+- We use signaling channels or contexts, which requires launching additional goroutines
+- Timeouts, those may launch some more goroutines.
+
+Of course, except for the ones we don't know how to terminate - Peter's colleagues' "long running components"
+
+* Termination can be evil
+
+- Termination code lives in its own goroutine, we can run out of those.
+- We don't know when the code to invoke termination will execute (or even if it will)
+- We don't know when the actual termination will occur either
+- Termination usually indicates an error (it's not part of the happy path). Badly tested*.
+- Error flows are unpredictable
+
+*If it's part of your happy path, you might want to reconsider your architecture because of all the above
+
+* Graceful shutdowns are even worse
+
+- We are interrupting the shutdown of the app, making it longer, better have a good reason like a critical operation.
+- Releasing resources is tricky and if we get things wrong we can cause an error that will change the exit code.
+
+But we all need to know how to do it.
+
+* So let's write the code
+
+We will build a TCP server that gracefully shutdowns.

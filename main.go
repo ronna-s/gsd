@@ -17,12 +17,15 @@ func handle(conn net.Conn, ctx context.Context) {
 
 	go func() {
 		<-ctx.Done()
+		//maybe some critical code
 		conn.Close()
 	}()
 
 	if _, err := io.Copy(conn, conn); err != nil {
 		log.Println(err)
 	}
+	cancel()
+
 }
 
 func serve(l net.Listener, ctx context.Context) error {
@@ -49,12 +52,13 @@ func listenAndServe(network, address string, ctx context.Context, ready chan str
 	if err != nil {
 		return err
 	}
+	defer l.Close()
+
 	close(ready)
 	go func() {
 		<-ctx.Done()
 		l.Close()
 	}()
-	defer l.Close()
 
 	return serve(l, ctx)
 }
@@ -64,16 +68,15 @@ func main() {
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 
 	ctx, cancel := context.WithCancel(context.Background())
-
 	go func() {
 		<-sigCh
 		cancel()
 	}()
+
 	ready := make(chan struct{})
 	go func() {
 		<-ready
 		log.Println("ready to accept connections")
 	}()
-
 	log.Fatal(listenAndServe("tcp", ":9090", ctx, ready))
 }

@@ -19,11 +19,6 @@ _Never_start_a_goroutine_without_knowing_how_it_will_stop_
 .link https://peter.bourgon.org/go-for-industrial-programming/ Peter Bourgon, GopherCon Europe 2018
 _We_say_things_like_“never_start_a_goroutine_without_knowing_how_it_will_stop"_but_(...)_Most_goroutines_I_see_launched_by_my_colleagues_(...)_tend_to_be_structural_(...)_managing_long_running_components_with_indistinct_termination_semantics_
 
-
-
-
-
-
 * How do we "never start a goroutine without knowing how it will stop"?
 
 - We use signaling channels or contexts, which requires launching additional goroutines
